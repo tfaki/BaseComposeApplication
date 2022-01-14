@@ -2,12 +2,10 @@ package com.emirhan.basecomposeapplication.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.talhafaki.composablesweettoast.util.SweetToastUtil.SweetError
+import com.talhafaki.composablesweettoast.util.SweetToastUtil.SweetSuccess
 
 @Composable
 inline fun <reified T : BaseViewModel> BaseCompose(
@@ -18,10 +16,22 @@ inline fun <reified T : BaseViewModel> BaseCompose(
         content.invoke(baseViewModel)
 
         if (baseViewModel.isLoading.value == true) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            SweetSuccess("Success!")
+
         }
-        if (!baseViewModel.error.value.isNullOrBlank()) {
-            SweetError(baseViewModel.error.value ?: "Unexpected error!")
+
+        baseViewModel.isLoading.observeForever {
+            if (it) {
+                // TODO
+                //CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+
+        baseViewModel.error.observeForever {
+            if (!it.isNullOrBlank()) {
+                // TODO
+                //SweetError(message = it, duration = Toast.LENGTH_SHORT)
+            }
         }
     }
 }
