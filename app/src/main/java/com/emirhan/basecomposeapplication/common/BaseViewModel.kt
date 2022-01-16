@@ -1,6 +1,6 @@
 package com.emirhan.basecomposeapplication.common
 
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 open class BaseViewModel : ViewModel() {
-    val isLoading = MutableLiveData<Boolean>()
-    val error = MutableLiveData<String>()
+    private val mutableBaseState = mutableStateOf(BaseState())
+    val baseState = mutableBaseState
 
     fun <T> handleRequest(
         flow: Flow<Resource<T>>,
-        onSuccess: (T) -> Unit,
+        onSuccess: ((T) -> Unit),
         onError: ((String) -> Unit)? = null,
         onLoading: (() -> Unit)? = null,
         onComplete: (() -> Unit)? = null
@@ -22,14 +22,16 @@ open class BaseViewModel : ViewModel() {
             when (result) {
                 is Resource.Success -> {
                     result.data?.let { response ->
-                        onSuccess(response)
+                        onSuccess.invoke(response)
+                        mutableBaseState.value = BaseState()
                     }
                 }
                 is Resource.Error -> {
                     if (onError != null)
                         onError.invoke(result.message ?: "Unexpected error occured!")
                     else {
-                        error.value = result.message
+                        mutableBaseState.value =
+                            BaseState(error = result.message ?: "Unexpected error occured!")
                     }
                 }
                 is Resource.Loading -> {
@@ -37,11 +39,10 @@ open class BaseViewModel : ViewModel() {
                     if (onLoading != null)
                         onLoading.invoke()
                     else
-                        isLoading.value = true
+                        mutableBaseState.value = BaseState(true)
                 }
             }
             onComplete?.invoke()
-            isLoading.value = false
         }.launchIn(viewModelScope)
     }
 }

@@ -1,10 +1,10 @@
 package com.emirhan.basecomposeapplication.data.data_source
-
+/*
 import androidx.room.Dao
 
 @Dao
 interface PokemonDao {
-    /*
+
     @Query("SELECT * FROM pokemon")
     fun getPokemons(): Flow<List<Pokemon>>
 
@@ -16,5 +16,5 @@ interface PokemonDao {
 
     @Delete
     suspend fun deletePokemon(pokemon: Pokemon)
-     */
 }
+ */

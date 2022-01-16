@@ -2,36 +2,29 @@ package com.emirhan.basecomposeapplication.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.talhafaki.composablesweettoast.util.SweetToastUtil.SweetSuccess
+import com.talhafaki.composablesweettoast.util.SweetToastUtil
 
 @Composable
 inline fun <reified T : BaseViewModel> BaseCompose(
     baseViewModel: T = hiltViewModel(),
     content: (@Composable (viewModel: T) -> Unit)
 ) {
+    val baseState = baseViewModel.baseState.value
+
     Box(modifier = Modifier.fillMaxSize()) {
         content.invoke(baseViewModel)
 
-        if (baseViewModel.isLoading.value == true) {
-            SweetSuccess("Success!")
-
+        if (!baseState.error.isNullOrBlank()) {
+            SweetToastUtil.SweetError(message = baseState.error!!)
         }
 
-        baseViewModel.isLoading.observeForever {
-            if (it) {
-                // TODO
-                //CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-        }
-
-        baseViewModel.error.observeForever {
-            if (!it.isNullOrBlank()) {
-                // TODO
-                //SweetError(message = it, duration = Toast.LENGTH_SHORT)
-            }
+        if (baseState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
